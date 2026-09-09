@@ -1,0 +1,147 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TodoList.ViewModels"
+        x:Class="TodoList.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="TODO List"
+        Width="880" Height="640"
+        MinWidth="680" MinHeight="420"
+        Background="#F4F5F7"
+        Icon="/Assets/icon.png">
+
+  <Window.Styles>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#0F6CBD"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.primary:pointerover">
+      <Setter Property="Background" Value="#115EA3"/>
+    </Style>
+    <Style Selector="Button.primary:pressed">
+      <Setter Property="Background" Value="#0C3B5E"/>
+    </Style>
+
+    <Style Selector="Border.todoCard">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="12,10,16,10"/>
+      <Setter Property="Margin" Value="0,0,0,10"/>
+      <Setter Property="BorderThickness" Value="4,0,0,0"/>
+      <Setter Property="BoxShadow" Value="0 1 3 0 #14000000"/>
+    </Style>
+
+    <Style Selector="Button.statusButton">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Width" Value="42"/>
+      <Setter Property="Height" Value="42"/>
+      <Setter Property="FontSize" Value="22"/>
+      <Setter Property="CornerRadius" Value="21"/>
+      <Setter Property="VerticalAlignment" Value="Top"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.statusButton:pointerover">
+      <Setter Property="Background" Value="#EBEBEB"/>
+    </Style>
+
+    <Style Selector="Button.actionBtn">
+      <Setter Property="Padding" Value="12,4"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="CornerRadius" Value="4"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="MinWidth" Value="56"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <Style Selector="TextBlock.meta">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="#757575"/>
+    </Style>
+  </Window.Styles>
+
+  <DockPanel>
+    <!-- 顶部工具栏 -->
+    <Border DockPanel.Dock="Top" Background="White" Padding="20,12"
+            BorderBrush="#E5E5E5" BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Button Grid.Column="0" Classes="primary" Padding="16,8"
+                Command="{Binding AddCommand}">＋ 新增 TODO</Button>
+        <TextBlock Grid.Column="2" Text="{Binding SummaryText}"
+                   VerticalAlignment="Center" Foreground="#616161" FontSize="13"/>
+      </Grid>
+    </Border>
+
+    <!-- 列表区域 -->
+    <Grid Margin="20,16,20,16">
+      <ScrollViewer>
+        <ItemsControl ItemsSource="{Binding Todos}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:TodoItemViewModel">
+              <Border Classes="todoCard"
+                      BorderBrush="{Binding StatusBrush}"
+                      Opacity="{Binding CardOpacity}">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                  <!-- 状态按钮：点击循环切换 -->
+                  <Button Grid.Column="0" Classes="statusButton"
+                          Command="{Binding CycleStatusCommand}"
+                          Foreground="{Binding StatusBrush}"
+                          ToolTip.Tip="点击切换状态：未完成 → 已完成 → 不需要完成 → 未完成">
+                    <TextBlock Text="{Binding StatusSymbol}"/>
+                  </Button>
+
+                  <!-- 内容与元数据 -->
+                  <StackPanel Grid.Column="1" Margin="12,0,16,0" Spacing="4"
+                              VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Content}" TextWrapping="Wrap"
+                               FontSize="15"
+                               TextDecorations="{Binding ContentDecorations}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                      <TextBlock Classes="meta" Text="{Binding DueText}" FontWeight="SemiBold"
+                                 Foreground="{Binding DueBrush}"
+                                 IsVisible="{Binding HasDue}"/>
+                      <TextBlock Classes="meta" Text="{Binding RangeText}"
+                                 IsVisible="{Binding HasRange}"/>
+                      <TextBlock Classes="meta" Text="{Binding CreatedText}"/>
+                    </StackPanel>
+                  </StackPanel>
+
+                  <!-- 操作按钮 -->
+                  <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
+                              VerticalAlignment="Center">
+                    <Button Classes="actionBtn" Content="编辑"
+                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).EditCommand}"
+                            CommandParameter="{Binding}"/>
+                    <Button Classes="actionBtn"
+                            Foreground="{Binding DeleteForeground}"
+                            Background="{Binding DeleteBackground}"
+                            BorderBrush="{Binding DeleteBorderBrush}"
+                            Command="{Binding $parent[ItemsControl].((vm:MainWindowViewModel)DataContext).RequestDeleteCommand}"
+                            CommandParameter="{Binding}">
+                      <Panel>
+                        <TextBlock Text="删除" IsVisible="{Binding !IsDeleteConfirming}"/>
+                        <TextBlock Text="确认删除？" IsVisible="{Binding IsDeleteConfirming}"/>
+                      </Panel>
+                    </Button>
+                  </StackPanel>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+
+      <!-- 空列表提示 -->
+      <TextBlock Text="暂无 TODO，点击上方「＋ 新增 TODO」开始"
+                 IsVisible="{Binding HasNoTodos}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center"
+                 Foreground="#9E9E9E" FontSize="15"
+                 IsHitTestVisible="False"/>
+    </Grid>
+  </DockPanel>
+</Window>

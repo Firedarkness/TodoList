@@ -1,0 +1,16 @@
+## .NET build artifacts
+bin/
+obj/
+artifacts/
+TestResults/
+*.binlog
+
+## Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.DotSettings.user
+
+## Publish output
+publish/

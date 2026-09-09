@@ -1,0 +1,122 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:TodoList.ViewModels"
+        x:Class="TodoList.Views.TodoEditWindow"
+        x:DataType="vm:TodoEditViewModel"
+        Title="{Binding WindowTitle}"
+        Width="500"
+        MaxHeight="760"
+        SizeToContent="Height"
+        CanResize="False"
+        Background="#FAFAFA"
+        Icon="/Assets/icon.png">
+
+  <Window.Styles>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#0F6CBD"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.primary:pointerover">
+      <Setter Property="Background" Value="#115EA3"/>
+    </Style>
+    <Style Selector="Button.primary:pressed">
+      <Setter Property="Background" Value="#0C3B5E"/>
+    </Style>
+
+    <Style Selector="TextBlock.fieldLabel">
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Foreground" Value="#424242"/>
+    </Style>
+
+    <Style Selector="TextBlock.subLabel">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Foreground" Value="#616161"/>
+      <Setter Property="Margin" Value="0,0,0,2"/>
+    </Style>
+
+    <Style Selector="DatePicker, TimePicker">
+      <Setter Property="MaxWidth" Value="280"/>
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="*,Auto" Margin="22">
+    <ScrollViewer Grid.Row="0">
+      <StackPanel Spacing="16">
+        <!-- 工作内容 -->
+        <StackPanel Spacing="6">
+          <TextBlock Classes="fieldLabel" Text="工作内容 *"/>
+          <TextBox Text="{Binding Content}"
+                   Watermark="必填：要做什么？"
+                   MinHeight="72"
+                   TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- 状态 -->
+        <StackPanel Spacing="6">
+          <TextBlock Classes="fieldLabel" Text="状态"/>
+          <ComboBox SelectedIndex="{Binding StatusIndex}"
+                    MinWidth="220" HorizontalAlignment="Left">
+            <ComboBoxItem>未完成</ComboBoxItem>
+            <ComboBoxItem>已完成</ComboBoxItem>
+            <ComboBoxItem>不需要完成</ComboBoxItem>
+          </ComboBox>
+        </StackPanel>
+
+        <!-- 截止时间 -->
+        <StackPanel Spacing="6">
+          <CheckBox Content="设置截止时间" IsChecked="{Binding HasDueTime}" FontWeight="SemiBold"/>
+          <StackPanel Spacing="10" Margin="26,4,0,0" IsEnabled="{Binding HasDueTime}">
+            <StackPanel Spacing="2">
+              <TextBlock Classes="subLabel" Text="日期"/>
+              <DatePicker SelectedDate="{Binding DueDate}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Classes="subLabel" Text="时刻"/>
+              <TimePicker SelectedTime="{Binding DueClock}"/>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+
+        <!-- 时间范围（可选） -->
+        <StackPanel Spacing="6">
+          <CheckBox Content="设置时间范围（可选）" IsChecked="{Binding HasRange}" FontWeight="SemiBold"/>
+          <StackPanel Spacing="10" Margin="26,4,0,0" IsEnabled="{Binding HasRange}">
+            <StackPanel Spacing="2">
+              <TextBlock Classes="subLabel" Text="开始日期"/>
+              <DatePicker SelectedDate="{Binding StartDate}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Classes="subLabel" Text="开始时刻"/>
+              <TimePicker SelectedTime="{Binding StartClock}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Classes="subLabel" Text="结束日期"/>
+              <DatePicker SelectedDate="{Binding EndDate}"/>
+            </StackPanel>
+            <StackPanel Spacing="2">
+              <TextBlock Classes="subLabel" Text="结束时刻"/>
+              <TimePicker SelectedTime="{Binding EndClock}"/>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+
+        <!-- 校验错误 -->
+        <TextBlock Text="{Binding ValidationError}"
+                   Foreground="#D13438" FontWeight="SemiBold"
+                   TextWrapping="Wrap"/>
+      </StackPanel>
+    </ScrollViewer>
+
+    <!-- 按钮区 -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                Spacing="10" Margin="0,18,0,0">
+      <Button Content="取消" Click="Cancel_Click" Padding="18,8" CornerRadius="6"/>
+      <Button Classes="primary" Content="保存" Click="Save_Click"
+              Padding="18,8" IsEnabled="{Binding CanSave}"/>
+    </StackPanel>
+  </Grid>
+</Window>
